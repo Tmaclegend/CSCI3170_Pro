@@ -139,8 +139,70 @@ public class Driver {
     }
 
     public static void FinishTrip(Statement stmt) throws SQLException {
+        //get the id
+        System.out.println("Please enter your ID.");
+
+        //get the did
+        Scanner scanner = new Scanner(System.in);
+        while (!scanner.hasNextInt()) {
+            System.out.println("Wrong or Invalid input\n Please enter your ID");
+        }
+        int did = scanner.nextInt(); 
+
+        //get the current trip info
+        String query = "SELECT t.id, t.passenger_id, t.start "
+               + "FROM trip t "
+               + "WHERE t.driver_id = '" + did + "' AND end IS NULL;";
+        ResultSet rs = stmt.executeQuery(query); 
+        try {
+            rs = stmt.executeQuery(query);
+        } catch (SQLException ex) {
+            System.out.println("Error in finding trip");
+        }
+        System.out.println(rs.getInt("id") + ", " + rs.getInt("passenger_id") + ", " +rs.getDate("start"));
+        System.out.println("Do you wish to finish the trip? [y/n]");
+        while(!scanner.hasNext()){ // stupid method
+            System.out.println("Wrong or Invalid input\n Please enter [y/n]."); 
+        }
+        String input = scanner.next();
+        while(input.length() != 1 || input.charAt(0) != 'y' || input.charAt(0) != 'n'){
+            System.out.println("Wrong or Invalid input\n Please enter [y/n]."); 
+            while(!scanner.hasNext()){
+                System.out.println("Wrong or Invalid input\n Please enter [y/n]."); 
+            }
+            input = scanner.next();
+        }
+        if(input.charAt(0) == 'n'){
+            return;
+        }else{
+            //take current time
+            java.util.Date currentDate = Calendar.getInstance().getTime();
+            long diff = rs.getDate("start").getTime();
+
+            //calculate the fee and record all thwe things to print
+            int tid = rs.getInt("id");
+            String name = rs.getString("passenger_id");
+            Date start = rs.getDate("start");
+            int fee = (int)(diff / 60);
+
+            //update the trip table
+            query = "UPDATE trip "
+                + "SET end ='" + currentDate + "', fee = '" + fee + "' "
+                + "WHERE id = '" + tid + "';";
+            rs = stmt.executeQuery(query); 
+            try {
+                rs = stmt.executeQuery(query);
+            } catch (SQLException ex) {
+                System.out.println("Error in updating the trip");
+            }
+            //print to the console
+            System.out.print(tid + ", " + name + ", "+ start + ", " + currentDate + ", " + fee);
+
+        }
 
     }
+
+
     public static void checkDriverRating(Statement stmt) throws SQLException {
         System.out.println("Please enter your ID.");
         Scanner scanner = new Scanner(System.in);
