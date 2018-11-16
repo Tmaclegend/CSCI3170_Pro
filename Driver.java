@@ -2,9 +2,12 @@ import java.util.*;
 import java.io.*;
 import java.sql.*;
 import java.text.*;
+import java.util.Date;
+
 
 
 public class Driver {
+
     public static void printDriver(){
         System.out.println("Driver, what would you like to do");
         System.out.println("1. Take a request");
@@ -14,17 +17,128 @@ public class Driver {
         System.out.println("Please enter [1-4].");
     }
     public static void TakeRequest(Statement stmt) throws SQLException {
+        System.out.println("Please enter your ID.");
 
+        //get the did
+        Scanner scanner = new Scanner(System.in);
+        while (!scanner.hasNextInt()) {
+            System.out.println("Wrong or Invalid input\n Please enter your ID");
+        }
+        int did = scanner.nextInt(); 
+
+        //print the record
+        System.out.println("Request ID, Passenger name, Passengers"); 
+        String query = "Select r.id, p.name, r.passengers "
+                + "FROM request r, passenger p "
+                + "WHERE r.id = p.id AND r.taken = '0';"; 
+        ResultSet rs = stmt.executeQuery(query);
+        try {
+            rs = stmt.executeQuery(query);
+        } catch (SQLException ex) {
+            System.out.println("Error in Show Request");
+        }
+        try {
+            while(rs.next()){
+                System.out.println(rs.getInt("id") + ", " + rs.getString("name") + ", " + rs.getInt("passengers"));
+            }
+        } catch (SQLException ex) {
+            System.out.println("Error");
+        }
+
+        //ask for take which request
+        System.out.println("Please enter the request ID.");
+        int rid = scanner.nextInt();
+
+        //search for the driver taking request or not 
+        query = "Select t.id "
+            + "FROM trip t "
+            + "WHERE t.driver_id = '" + did + "' AND t.end IS NULL;";
+        rs = stmt.executeQuery(query);
+
+        try {
+            rs = stmt.executeQuery(query);
+        } catch (SQLException ex) {
+            System.out.println("Error in Show Request");
+        }
+
+        try {
+            if(rs.next()){
+                System.out.println("Error, you are taking a trip"); 
+            }
+            else {
+                //get the info of the rid
+                query = "Select r.passenger_id, r.passengers "
+                    + "FROM request r "
+                    + "WHERE r.id = '" + rid + "';"; 
+
+                rs = stmt.executeQuery(query);
+
+                try {
+                    rs = stmt.executeQuery(query);
+                } catch (SQLException ex) {
+                    System.out.println("Error in getting the request info");
+                }
+
+                int r_pid = rs.getInt("passenger_id");
+                int noOfPassengers = rs.getInt("passengers");
+                //make the request taken to 1
+                query = "UPDATE request r "
+                    + "SET  r.taken = '1' "
+                    + "WHERE r.id = '" + rid + "';";
+                
+                rs = stmt.executeQuery(query);
+                
+                try {
+                    rs = stmt.executeQuery(query);
+                } catch (SQLException ex) {
+                    System.out.println("Error in getting the request info");
+                }
+
+                //insert info to trip
+                java.util.Date currentDate = Calendar.getInstance().getTime();
+                query = "INSERT INTO trip (driver_id, passenger_id, passenger, start) "
+                    + "VALUES ('" + did + "', '" + r_pid + "', '" + noOfPassengers + "', '" + currentDate + "');";
+                rs = stmt.executeQuery(query);
+            
+                try {
+                    rs = stmt.executeQuery(query);
+                } catch (SQLException ex) {
+                    System.out.println("Error in adding the trip info");
+                }
+                //print result
+                System.out.println("Trip ID, Passngers name, Start");
+                query = "SELECT t.id, p.name, t.start "
+                    + "FROM trip t, passenger p "
+                    + "WHERE p.id = t.passenger_id AND p.id = '" + r_pid + "' AND t.driver_id = '" + did + "' AND end IS NULL;";
+                
+                rs = stmt.executeQuery(query); 
+                try {
+                    rs = stmt.executeQuery(query);
+                } catch (SQLException ex) {
+                    System.out.println("Error in adding the trip info");
+                }
+
+                try {
+                    System.out.println(rs.getInt("id") + ", " + rs.getString("name") + ", " + rs.getDate("start"));
+                } catch (SQLException ex) {
+                    System.out.println("Error");
+                }
+                //end
+
+            }
+        } catch (SQLException ex) {
+            System.out.println("Error");
+        }
     }
 
     public static void FinishTrip(Statement stmt) throws SQLException {
 
     }
     public static void checkDriverRating(Statement stmt) throws SQLException {
-        System.out.print("Please enter your ID.");
+        System.out.println("Please enter your ID.");
         Scanner scanner = new Scanner(System.in);
         while (!scanner.hasNextInt()) {
-            System.out.print("Wrong or Invalid input\n Please enter your ID");
+            System.out.println("Wrong or Invalid input\n Please enter your ID");
         }
         int did = scanner.nextInt();
         //query
@@ -46,7 +160,7 @@ public class Driver {
                 count++;
             }
             double result = rate / count;
-            System.out.print("Your driver rating is " + result + "\n");
+            System.out.println("Your driver rating is " + result);
         } catch (SQLException ex) {
             System.out.println("Error");
         }
