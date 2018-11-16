@@ -25,48 +25,54 @@ public class SystemAdmin {
             stmt.executeUpdate("DROP TABLE IF EXISTS request;");
             stmt.executeUpdate("DROP TABLE IF EXISTS trip;");
 
-            stmt.executeUpdate("CREATE TABLE driver("
+            stmt.executeUpdate("CREATE TABLE driver( "
                     + "id integer NOT NULL, "
-                    + "name varchar(20),"
-                    + "vehicle_id varchar(20),"
+                    + "name varchar(20), "
+                    + "vehicle_id varchar(20), "
 
                     + "PRIMARY KEY (id));");
 
-            stmt.executeUpdate("CREATE TABLE vehicle("
+            stmt.executeUpdate("CREATE TABLE vehicle( "
                     + "id varchar(20) NOT NULL, "
-                    + "model varchar(50),"
-                    + "model_year integer,"
-                    + "seats integer,"
+                    + "model varchar(50), "
+                    + "model_year integer, "
+                    + "seats integer, "
 
-                    + "PRIMARY KEY (id));");
+                    + "PRIMARY KEY (id)); ");
 
-            stmt.executeUpdate("CREATE TABLE passenger("
+            stmt.executeUpdate("CREATE TABLE passenger( "
                     + "id integer NOT NULL, "
-                    + "name varchar(20),"
+                    + "name varchar(20), "
 
-                    + "PRIMARY KEY (id));");
+                    + "PRIMARY KEY (id)); ");
 
             
-            stmt.executeUpdate("CREATE TABLE request("
+            stmt.executeUpdate("CREATE TABLE request( "
                     + "id integer NOT NULL AUTO_INCREMENT, "
-                    + "passenger_id integer,"
-                    + "model_year integer,"
-                    + "model varchar(50),"
-                    + "passengers integer,"
-                    + "taken integer,"
+                    + "passenger_id integer, "
+                    + "model_year integer, "
+                    + "model varchar(50), "
+                    + "passengers integer, "
+                    + "taken integer, "
 
-                    + "PRIMARY KEY (id));");
+                    + "PRIMARY KEY (id), "
+                    + "FOREIGN KEY (passenger_id) REFERENCES passenger(id) "
+                    +"); ");
 
-            stmt.executeUpdate("CREATE TABLE trip("
+            stmt.executeUpdate("CREATE TABLE trip( "
                     + "id integer NOT NULL AUTO_INCREMENT, "
-                    + "driver_id integer,"
-                    + "passenger_id integer,"
-                    + "start datetime,"
-                    + "end datetime,"
-                    + "fee integer,"
-                    + "rating integer,"
+                    + "driver_id integer, "
+                    + "passenger_id integer, "
+                    + "start datetime, "
+                    + "end datetime, "
+                    + "fee integer, "
+                    + "rating integer, "
 
-                    + "PRIMARY KEY (id));");
+                    + "PRIMARY KEY (id), "
+                    + "FOREIGN KEY (driver_id) REFERENCES driver(id), "
+                    + "FOREIGN KEY (passenger_id) REFERENCES passenger(id) "
+
+                    +"); ");
 
             System.out.println("Done! Tables are created");
         } catch (SQLException e) {
