@@ -38,9 +38,16 @@ public class Driver {
             System.out.println("Error in Show Request");
         }
         try {
+            boolean val = rs.next(); //next() returns false if there are no-rows retrieved 
+            if(val==false){
+                System.out.println("There are no requests");
+                return;
+            }
+            
             while(rs.next()){
                 System.out.println(rs.getInt("id") + ", " + rs.getString("name") + ", " + rs.getInt("passengers"));
             }
+            
         } catch (SQLException ex) {
             System.out.println("Error");
         }
