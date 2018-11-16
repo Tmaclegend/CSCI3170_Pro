@@ -58,7 +58,7 @@ public class SystemAdmin {
                     + "PRIMARY KEY (id));");
 
             stmt.executeUpdate("CREATE TABLE trip("
-                    + "id integer NOT NULL, "
+                    + "id integer NOT NULL AUTO_INCREMENT, "
                     + "driver_id integer,"
                     + "passenger_id integer,"
                     + "start datetime,"
