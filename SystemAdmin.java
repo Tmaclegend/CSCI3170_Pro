@@ -48,7 +48,7 @@ public class SystemAdmin {
 
             
             stmt.executeUpdate("CREATE TABLE request("
-                    + "id integer NOT NULL, "
+                    + "id integer NOT NULL AUTO_INCREMENT, "
                     + "passenger_id integer,"
                     + "model_year integer,"
                     + "model varchar(50),"
