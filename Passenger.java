@@ -91,7 +91,6 @@ public class Passenger {
 		year = scanner.nextLine();
 		System.out.println("Please enter the model. (Press enter to skip)");
 		model = scanner.nextLine();
-		model.toLowerCase();
 		
 		//check input
 		if(!checkPid(con,pid))
@@ -111,9 +110,10 @@ public class Passenger {
 
 		try
 		{
-			pstmt = con.prepareStatement("SELECT count(*) AS avaliable FROM driver d,vehicle v WHERE d.vehicle_id=v.id AND model_year>=? AND LOWER(model) LIKE ?  AND d.id NOT IN ( SELECT driver_id FROM trip WHERE end IS NULL )");
+			pstmt = con.prepareStatement("SELECT count(*) AS avaliable FROM driver d,vehicle v WHERE d.vehicle_id=v.id AND model_year>=? AND LOWER(model) LIKE ? AND seats>=?  AND d.id NOT IN ( SELECT driver_id FROM trip WHERE end IS NULL )");
 			pstmt.setInt(1,Integer.parseInt(year));
-			pstmt.setString(2,"%"+model+"%");
+			pstmt.setString(2,"%"+model.toLowerCase()+"%");
+			pstmt.setInt(3,seat);
 
 			ResultSet rs = pstmt.executeQuery();
 
