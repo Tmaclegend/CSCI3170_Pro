@@ -35,7 +35,7 @@ public class Passenger {
 		return false;
 	}
 
-	//return true if such passenger
+	//return true if such passenger exist
 	public static Boolean checkPid(Connection con, int pid)
 	{
 		try
@@ -54,8 +54,105 @@ public class Passenger {
 
 		return false;
 	}
+
+	public static Boolean haveOpenRequest(Connection con, int pid)
+	{
+
+		try
+		{
+			PreparedStatement pstmt = con.prepareStatement("SELECT * FROM request WHERE passenger_id=? AND taken=0");
+			pstmt.setInt(1,pid);
+
+			ResultSet rs = pstmt.executeQuery();
+
+			return rs.next();
+		}
+		catch (SQLException e)
+		{
+			System.out.println(e.getMessage());
+		}
+
+		return false;
+	}
+
 	public static void requestRide(Connection con)
 	{
+		int pid,seat,noAvaliable;
+		String model="",year;
+		Scanner scanner = new Scanner(System.in);
+		PreparedStatement pstmt;
+
+		System.out.println("Please enter your ID");
+		pid = scanner.nextInt();
+		System.out.println("Please enter number of passenger");
+		seat= scanner.nextInt();
+		scanner.nextLine();
+		System.out.println("Please enter earlist model year. (Press enter to skip)");
+		year = scanner.nextLine();
+		System.out.println("Please enter the model. (Press enter to skip)");
+		model = scanner.nextLine();
+		model.toLowerCase();
+		
+		//check input
+		if(!checkPid(con,pid))
+		{
+			System.out.println("ERROR: No such passenger");
+			return;
+		}
+		if(haveOpenRequest(con,pid))
+		{
+			System.out.println("ERROR: You have open request");
+			return;
+		}
+		if(year.equals(""))
+		{
+			year="0";
+		}
+
+		try
+		{
+			pstmt = con.prepareStatement("SELECT count(*) AS avaliable FROM driver d,vehicle v WHERE d.vehicle_id=v.id AND model_year>=? AND LOWER(model) LIKE ?  AND d.id NOT IN ( SELECT driver_id FROM trip WHERE end IS NULL )");
+			pstmt.setInt(1,Integer.parseInt(year));
+			pstmt.setString(2,"%"+model+"%");
+
+			ResultSet rs = pstmt.executeQuery();
+
+			rs.next();
+			noAvaliable = rs.getInt("avaliable");
+
+			if(noAvaliable==0)
+			{
+				System.out.println("ERROR: no avaliable driver, please change your setting");
+				return;
+			}
+			else
+			{
+				System.out.println("Your request will be placed. "+noAvaliable+" driver are able to take your request");
+			}
+		}
+		catch(SQLException e)
+		{
+			System.out.println(e.getMessage());
+			return;
+		}
+
+
+		//put reauest into database
+		try
+		{
+			pstmt = con.prepareStatement("INSERT INTO request (passenger_id,model_year,model,passengers,taken) value(?,?,?,?,?)");
+			pstmt.setInt(1,pid);
+			pstmt.setInt(2,Integer.parseInt(year));
+			pstmt.setString(3,model);
+			pstmt.setInt(4,seat);
+			pstmt.setInt(5,0);
+			pstmt.executeUpdate();
+		}
+		catch(SQLException e)
+		{
+			System.out.println(e.getMessage());
+		}
+
 	}
 
 	public static void checkRecord(Connection con)
