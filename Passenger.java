@@ -116,6 +116,77 @@ public class Passenger {
 
 	public static void rate(Connection con)
 	{
+		int pid,tid,free,rating;
+		String dname,vid,model,queryStart,queryEnd;
+		java.sql.Timestamp start = new java.sql.Timestamp(System.currentTimeMillis());
+		java.sql.Timestamp end = new java.sql.Timestamp(System.currentTimeMillis());
+		Scanner scanner = new Scanner(System.in);
+		PreparedStatement pstmt;
+
+		//input
+		System.out.println("Please enter your ID.");
+		pid = scanner.nextInt();
+		System.out.println("Please enter your trip ID.");
+		tid = scanner.nextInt();
+		System.out.println("Please enter your rating.");
+		rating = scanner.nextInt();
+
+		//check input
+		if(!checkPidTid(con, pid, tid))
+		{
+			System.out.println("ERROR: No such passenger associate this trip");
+			return;
+		}
+
+		if(rating<1 || rating>5)
+		{
+			System.out.println("ERROR: rating should be between 1-5");
+			return;
+		}
+
+		//update database
+		try
+		{
+			pstmt = con.prepareStatement("UPDATE trip SET rating=? WHERE id=? AND passenger_id=?");
+			pstmt.setInt(1,rating);
+			pstmt.setInt(2,tid);
+			pstmt.setInt(3,pid);
+			pstmt.executeUpdate();
+		} catch (SQLException e)
+		{
+			System.out.println(e.getMessage());
+		}
+
+		//display
+		try
+		{
+			pstmt = con.prepareStatement("SELECT * FROM trip t,driver d,vehicle v WHERE t.driver_id=d.id AND d.vehicle_id=v.id AND passenger_id=? AND t.id=?");
+			pstmt.setInt(1,pid);
+			pstmt.setInt(2,tid);
+
+			ResultSet rs = pstmt.executeQuery();
+
+			System.out.println("Trip ID, Driver Name, Vehicle ID, Vehicle model, Start, End, Free, Rating");
+			while(rs.next())
+			{
+				tid = rs.getInt("id");
+				dname = rs.getString("d.name");
+				vid = rs.getString("v.id");
+				model = rs.getString("v.model");
+				start = rs.getTimestamp("t.start");
+				end = rs.getTimestamp("t.end");
+				free = rs.getInt("t.fee");
+				rating = rs.getInt("t.rating");
+
+				System.out.println(tid+", "+dname+", "+vid+", "+model+", "+start.toString()+", "+end.toString()+", "+free+", "+rating);
+
+			}
+		} 
+		catch(SQLException e)
+		{
+			System.out.println(e.getMessage());
+		}
+
 	}
 
 	public static void main(String[] args) throws Exception {
