@@ -20,11 +20,11 @@ public class RideSharingSystem {
         try {
             System.out.print("Processing...");
 
+            stmt.executeUpdate("DROP TABLE IF EXISTS request;");
+            stmt.executeUpdate("DROP TABLE IF EXISTS trip;");
             stmt.executeUpdate("DROP TABLE IF EXISTS driver;");
             stmt.executeUpdate("DROP TABLE IF EXISTS vehicle;");
             stmt.executeUpdate("DROP TABLE IF EXISTS passenger;");
-            stmt.executeUpdate("DROP TABLE IF EXISTS request;");
-            stmt.executeUpdate("DROP TABLE IF EXISTS trip;");
 
             stmt.executeUpdate("CREATE TABLE driver( "
                     + "id integer NOT NULL, "
@@ -85,11 +85,11 @@ public class RideSharingSystem {
     public static void deleteTables(Statement stmt) throws SQLException {
         try {
             System.out.print("Processing...");
+            stmt.executeUpdate("DROP TABLE IF EXISTS request;");
+            stmt.executeUpdate("DROP TABLE IF EXISTS trip;");
             stmt.executeUpdate("DROP TABLE IF EXISTS driver;");
             stmt.executeUpdate("DROP TABLE IF EXISTS vehicle;");
             stmt.executeUpdate("DROP TABLE IF EXISTS passenger;");
-            stmt.executeUpdate("DROP TABLE IF EXISTS request;");
-            stmt.executeUpdate("DROP TABLE IF EXISTS trip;");
             System.out.println("Done! Tables are deleted!");
         } catch (SQLException e) {
             System.out.println("[Error] Detele table failed");
