@@ -587,66 +587,79 @@ public class RideSharingSystem {
             if(rs.next()){
                 System.out.println("Error, you are taking a trip"); 
             }
-            else {
-                //get the info of the rid
-                query = "Select r.passenger_id, r.passengers "
-                    + "FROM request r "
-                    + "WHERE r.id = '" + rid + "';"; 
-
-                rs = stmt.executeQuery(query);
-
-                try {
+                else {
+                    //check the availablity of the driver
+                    query = "Select COUNT(d.id) AS result"
+                        + "FROM request r, driver d, vehicle v"
+                        + "WHERE r.id='" + rid + "'AND d.id = '" + did + "'AND d.vehicle_id = v.id AND r.passengers <= v.seats AND (r.model IS NULL OR r.model = v.model) AND r.model_year <= v.model_year";
                     rs = stmt.executeQuery(query);
-                } catch (SQLException ex) {
-                    System.out.println("Error in getting the request info");
-                }
+                    try {
+                        rs = stmt.executeQuery(query);
+                    } catch (SQLException ex) {
+                        System.out.println("Error in Show Request");
+                    }
+                    if(rs.getInt("result") == 1){
+                    //get the info of the rid
+                        query = "Select r.passenger_id, r.passengers "
+                            + "FROM request r "
+                            + "WHERE r.id = '" + rid + "';"; 
 
-                int r_pid = rs.getInt("passenger_id");
-                int noOfPassengers = rs.getInt("passengers");
-                //make the request taken to 1
-                query = "UPDATE request r "
-                    + "SET  r.taken = '1' "
-                    + "WHERE r.id = '" + rid + "';";
-                
-                rs = stmt.executeQuery(query);
-                
-                try {
-                    rs = stmt.executeQuery(query);
-                } catch (SQLException ex) {
-                    System.out.println("Error in getting the request info");
-                }
+                        rs = stmt.executeQuery(query);
 
-                //insert info to trip
-                java.util.Date currentDate = Calendar.getInstance().getTime();
-                query = "INSERT INTO trip (driver_id, passenger_id, passenger, start) "
-                    + "VALUES ('" + did + "', '" + r_pid + "', '" + noOfPassengers + "', '" + currentDate + "');";
-                rs = stmt.executeQuery(query);
-            
-                try {
-                    rs = stmt.executeQuery(query);
-                } catch (SQLException ex) {
-                    System.out.println("Error in adding the trip info");
-                }
-                //print result
-                System.out.println("Trip ID, Passngers name, Start");
-                query = "SELECT t.id, p.name, t.start "
-                    + "FROM trip t, passenger p "
-                    + "WHERE p.id = t.passenger_id AND p.id = '" + r_pid + "' AND t.driver_id = '" + did + "' AND end IS NULL;";
-                
-                rs = stmt.executeQuery(query); 
-                try {
-                    rs = stmt.executeQuery(query);
-                } catch (SQLException ex) {
-                    System.out.println("Error in adding the trip info");
-                }
+                        try {
+                            rs = stmt.executeQuery(query);
+                        } catch (SQLException ex) {
+                            System.out.println("Error in getting the request info");
+                        }
 
-                try {
-                    System.out.println(rs.getInt("id") + ", " + rs.getString("name") + ", " + rs.getDate("start"));
-                } catch (SQLException ex) {
-                    System.out.println("Error");
-                }
-                //end
+                        int r_pid = rs.getInt("passenger_id");
+                        int noOfPassengers = rs.getInt("passengers");
+                        //make the request taken to 1
+                        query = "UPDATE request r "
+                            + "SET  r.taken = '1' "
+                            + "WHERE r.id = '" + rid + "';";
+                        
+                        rs = stmt.executeQuery(query);
+                        
+                        try {
+                            rs = stmt.executeQuery(query);
+                        } catch (SQLException ex) {
+                            System.out.println("Error in getting the request info");
+                        }
 
+                        //insert info to trip
+                        java.util.Date currentDate = Calendar.getInstance().getTime();
+                        query = "INSERT INTO trip (driver_id, passenger_id, passenger, start) "
+                            + "VALUES ('" + did + "', '" + r_pid + "', '" + noOfPassengers + "', '" + currentDate + "');";
+                        rs = stmt.executeQuery(query);
+                    
+                        try {
+                            rs = stmt.executeQuery(query);
+                        } catch (SQLException ex) {
+                            System.out.println("Error in adding the trip info");
+                        }
+                        //print result
+                        System.out.println("Trip ID, Passngers name, Start");
+                        query = "SELECT t.id, p.name, t.start "
+                            + "FROM trip t, passenger p "
+                            + "WHERE p.id = t.passenger_id AND p.id = '" + r_pid + "' AND t.driver_id = '" + did + "' AND end IS NULL;";
+                        
+                        rs = stmt.executeQuery(query); 
+                        try {
+                            rs = stmt.executeQuery(query);
+                        } catch (SQLException ex) {
+                            System.out.println("Error in adding the trip info");
+                        }
+
+                        try {
+                            System.out.println(rs.getInt("id") + ", " + rs.getString("name") + ", " + rs.getDate("start"));
+                        } catch (SQLException ex) {
+                            System.out.println("Error");
+                        }
+                        //end
+                }else{
+                   System.out.println("Your vehicles cannot meet the requirement of the request selected."); 
+                }
             }
         } catch (SQLException ex) {
             System.out.println("Error");
