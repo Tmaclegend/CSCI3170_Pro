@@ -414,13 +414,27 @@ public class RideSharingSystem {
 
         queryStart = queryStart+" 00:00:00";
         queryEnd = queryEnd+" 23:59:59";
-
+        java.sql.Timestamp sqlQueryStart = null;
+        java.sql.Timestamp sqlQueryEnd = null;
+        try{
+            sqlQueryStart = java.sql.Timestamp.valueOf(queryStart);
+        }catch (Exception e){
+            System.out.println("ERROR: Wrong start date format [yyyy-mm-dd]");
+            return;
+        }
+        try{
+            sqlQueryEnd = java.sql.Timestamp.valueOf(queryEnd);
+        }catch (Exception e){
+            System.out.println("ERROR: Wrong end date format [yyyy-mm-dd]");
+            return;
+        }
+            
         try
         {
             PreparedStatement pstmt = con.prepareStatement("SELECT * FROM trip t,driver d,vehicle v WHERE t.driver_id=d.id AND d.vehicle_id=v.id AND passenger_id=? AND t.start>=? AND t.end<=? ORDER BY t.start DESC");
             pstmt.setInt(1,pid);
-            pstmt.setTimestamp(2,java.sql.Timestamp.valueOf(queryStart));
-            pstmt.setTimestamp(3,java.sql.Timestamp.valueOf(queryEnd));
+            pstmt.setTimestamp(2,sqlQueryStart);
+            pstmt.setTimestamp(3,sqlQueryEnd);
 
             ResultSet rs = pstmt.executeQuery();
 
