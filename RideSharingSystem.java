@@ -541,11 +541,15 @@ public class RideSharingSystem {
         }
         int did = scanner.nextInt(); 
 
+
+
         //print the record
         System.out.println("Request ID, Passenger name, Passengers"); 
         String query = "Select r.id, p.name, r.passengers "
                 + "FROM request r, passenger p "
-                + "WHERE r.id = p.id AND r.taken = '0';"; 
+                + "WHERE r.passenger_id = p.id "
+                + "AND r.taken = '0';"; 
+
         ResultSet rs = stmt.executeQuery(query);
         try {
             rs = stmt.executeQuery(query);
@@ -667,53 +671,67 @@ public class RideSharingSystem {
         //get the current trip info
         String query = "SELECT t.id, t.passenger_id, t.start "
                + "FROM trip t "
-               + "WHERE t.driver_id = '" + did + "' AND end IS NULL;";
-        ResultSet rs = stmt.executeQuery(query); 
+               + "WHERE t.driver_id = " + did + " AND end IS NULL;";
+        ResultSet rs = null;
         try {
             rs = stmt.executeQuery(query);
         } catch (SQLException ex) {
             System.out.println("Error in finding trip");
+            return;
         }
-        System.out.println(rs.getInt("id") + ", " + rs.getInt("passenger_id") + ", " +rs.getDate("start"));
-        System.out.println("Do you wish to finish the trip? [y/n]");
-        while(!scanner.hasNext()){ // stupid method
-            System.out.println("Wrong or Invalid input\n Please enter [y/n]."); 
-        }
-        String input = scanner.next();
-        while(input.length() != 1 || input.charAt(0) != 'y' || input.charAt(0) != 'n'){
-            System.out.println("Wrong or Invalid input\n Please enter [y/n]."); 
-            while(!scanner.hasNext()){
+        if (rs.next() ){
+            System.out.println("Trip ID, Passnger ID, Start");
+            System.out.println(rs.getInt("id") + ", " + rs.getInt("passenger_id") + ", " +rs.getDate("start"));
+            System.out.println("Do you wish to finish the trip? [y/n]");
+            while(!scanner.hasNext()){ // stupid method
                 System.out.println("Wrong or Invalid input\n Please enter [y/n]."); 
             }
-            input = scanner.next();
-        }
-        if(input.charAt(0) == 'n'){
-            return;
-        }else{
-            //take current time
-            java.util.Date currentDate = Calendar.getInstance().getTime();
-            long diff = rs.getDate("start").getTime();
-
-            //calculate the fee and record all thwe things to print
-            int tid = rs.getInt("id");
-            String name = rs.getString("passenger_id");
-            Date start = rs.getDate("start");
-            int fee = (int)(diff / 60);
-
-            //update the trip table
-            query = "UPDATE trip "
-                + "SET end ='" + currentDate + "', fee = '" + fee + "' "
-                + "WHERE id = '" + tid + "';";
-            rs = stmt.executeQuery(query); 
-            try {
-                rs = stmt.executeQuery(query);
-            } catch (SQLException ex) {
-                System.out.println("Error in updating the trip");
+            String input = scanner.next();
+            while(input.charAt(0) != 'y' && input.charAt(0) != 'n'){
+                System.out.println("Wrong or Invalid input\n Please enter [y/n]."); 
+                while(!scanner.hasNext()){
+                    System.out.println("Wrong or Invalid input\n Please enter [y/n]."); 
+                }
+                input = scanner.next();
             }
-            //print to the console
-            System.out.print(tid + ", " + name + ", "+ start + ", " + currentDate + ", " + fee);
+            if(input.charAt(0) == 'n'){
+                return;
+            }else{
+                //take current time
+                //java.util.Date currentDate = Calendar.getInstance().getTime();
+                //long diff = rs.getDate("start").getTime();
 
+                //calculate the fee and record all thwe things to print
+                int tid = rs.getInt("id");
+                String name = rs.getString("passenger_id");
+                java.sql.Timestamp  start = rs.getTimestamp("start");
+                //int fee = (int)(diff / 60);
+                java.sql.Timestamp end = new java.sql.Timestamp(System.currentTimeMillis());
+
+                long milliseconds1 = start.getTime();
+                long milliseconds2 = end.getTime();
+                long diff = milliseconds2 - milliseconds1;
+                int fee = (int)Math.floor(diff / (60 * 1000));
+                //update the trip table
+                query = "UPDATE trip "
+                    + "SET end ='" + end + "', fee = '" + fee + "' "
+                    + "WHERE id = '" + tid + "';";
+                try {
+                    stmt.executeUpdate(query);
+                } catch (SQLException ex) {
+                    System.out.println("Error in updating the trip");
+                    System.out.println(ex);
+                    return;
+                }
+                //print to the console
+                System.out.println("Trip ID, Passnger name, Start, End, Fee");
+                System.out.println(tid + ", " + name + ", "+ start + ", " + end + ", " + fee);
+
+            }
+        }else{
+            System.out.println("You don't have any unfinished trip.");
         }
+        
 
     }
 
