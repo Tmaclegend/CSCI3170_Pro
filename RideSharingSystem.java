@@ -556,7 +556,7 @@ public class RideSharingSystem {
     {
         try
         {
-            PreparedStatement pstmt = con.prepareStatement("SELECT * FROM trip WHERE id=? AND END IS NULL");
+            PreparedStatement pstmt = con.prepareStatement("SELECT * FROM trip WHERE driver_id=? AND END IS NULL");
             pstmt.setInt(1,did);
 
             ResultSet rs = pstmt.executeQuery();
@@ -573,9 +573,10 @@ public class RideSharingSystem {
 
     public static void TakeRequest(Connection con) throws SQLException 
     {
-	    int did,myYear,mySeat,takeRequestID;
-	    Set<Integer> set=new  HashSet<Integer>(); 
+	    int did,myYear,mySeat,takeRequestID,count=0;
 	    String myModel;
+	    Set<Integer> set=new  HashSet<Integer>();
+	    Map<Integer,Integer> map =new HashMap<Integer,Integer>();
 	    Scanner scanner = new Scanner(System.in);
 
 	    System.out.println("Please enter your ID");
@@ -601,7 +602,6 @@ public class RideSharingSystem {
 		    mySeat=rs.getInt("v.seats");
 		    myModel=rs.getString("v.model");
 
-		    System.out.println(myYear+" "+mySeat+" "+myModel);
 	    }
 	    catch(SQLException e)
 	    {
@@ -623,21 +623,55 @@ public class RideSharingSystem {
 		    {
 				System.out.println(rs.getInt("r.id")+" "+rs.getString("p.name")+" "+rs.getInt("r.passengers"));
 				set.add(rs.getInt("r.id"));
+				map.put(rs.getInt("r.id"),rs.getInt("r.passenger_id"));
+				count++;
+		    }
+
+		    if(count==0)
+		    {
+			    System.out.println("You have no request to take");
+			    return;
 		    }
 	    } catch (SQLException e)
 	    {
 		    System.out.println(e.getMessage());
 	    }
 
+	    // io and checking
 	    System.out.println("Please enter the request ID");
 	    takeRequestID=scanner.nextInt();
-
 	    if(!set.contains(takeRequestID))
 	    {
 		    System.out.println("Please take a request ID from the above list");
 		    return;
 	    }
 
+	    //update table request
+	    try
+	    {
+		    PreparedStatement pstmt = con.prepareStatement("UPDATE request SET taken=1 WHERE id=?");
+		    pstmt.setInt(1,takeRequestID);
+		    pstmt.executeUpdate();
+	    }catch(SQLException e)
+	    {
+		    System.out.println(e.getMessage());
+		    return;
+	    }
+
+	    //insert into trip
+	    try
+	    {
+		    PreparedStatement pstmt = con.prepareStatement("INSERT INTO trip (driver_id,passenger_id,start,end,fee,rating) value(?,?,?,NULL,NULL,0)");
+		    pstmt.setInt(1,did);
+		    pstmt.setInt(2,map.get(takeRequestID));
+		    java.sql.Timestamp start = new java.sql.Timestamp(System.currentTimeMillis());
+		    pstmt.setTimestamp(3,start);
+		    pstmt.executeUpdate();
+	    }catch(SQLException e)
+	    {
+		    System.out.println(e.getMessage());
+		    return;
+	    }
 
     }
 
@@ -721,7 +755,7 @@ public class RideSharingSystem {
 
 
     public static void checkDriverRating(Statement stmt) throws SQLException {
-	int rating;
+	float rating;
         System.out.println("Please enter your ID.");
         Scanner scanner = new Scanner(System.in);
         while (!scanner.hasNextInt()) {
@@ -729,12 +763,12 @@ public class RideSharingSystem {
         }
         int did = scanner.nextInt();
         //query
-        String query = "Select avg(rating) as avgrating FROM trip t WHERE  t.driver_id = " + did + " AND  t.rating!=0";
+        String query = "Select round(avg(rating),2) as avgrating FROM trip t WHERE  t.driver_id = " + did + " AND  t.rating!=0";
 
         try {
 		ResultSet rs = stmt.executeQuery(query);
 		rs.next();
-		rating=rs.getInt("avgrating");
+		rating=rs.getFloat("avgrating");
 		System.out.println("Your driver rating is"+rating);
         } catch (SQLException ex) {
             System.out.println("Error in Show Driver Rating");
