@@ -816,17 +816,17 @@ public class RideSharingSystem {
             //     System.out.println("Wrong or Invalid input\nPlease enter [y/n]."); 
             // }
             String input = scanner.next();
-            if(input.charAt(0) != 'y' && input.charAt(0) != 'n'){
-                System.out.println("ERROR: Invalid input"); 
+            // if(input.charAt(0) != 'y' && input.charAt(0) != 'n'){
+            //     System.out.println("ERROR: Invalid input"); 
+            //     return;
+            //     // while(!scanner.hasNext()){
+            //     //     System.out.println("Wrong or Invalid input\nPlease enter [y/n]."); 
+            //     // }
+            //     // input = scanner.next();
+            // }
+            if(input.equals("n")){
                 return;
-                // while(!scanner.hasNext()){
-                //     System.out.println("Wrong or Invalid input\nPlease enter [y/n]."); 
-                // }
-                // input = scanner.next();
-            }
-            if(input.charAt(0) == 'n'){
-                return;
-            }else{
+            }else if(input.equals("y")){
                 //take current time
                 //java.util.Date currentDate = Calendar.getInstance().getTime();
                 //long diff = rs.getDate("start").getTime();
@@ -857,6 +857,9 @@ public class RideSharingSystem {
                 System.out.println("Trip ID, Passnger name, Start, End, Fee");
                 System.out.println(tid + ", " + name + ", "+ start + ", " + end + ", " + fee);
 
+            }else{
+                System.out.println("ERROR: Invalid input"); 
+                return;
             }
         }else{
             System.out.println("You don't have any unfinished trip.");
@@ -960,55 +963,55 @@ public class RideSharingSystem {
 
         Scanner scanner = new Scanner(System.in);
         printRideSharingSystem();
-        while (scanner.hasNextInt()) {
-            int input = scanner.nextInt();
-            if (input == 1) {
+        while (scanner.hasNext()) {
+            String input = scanner.next();
+            if (input.equals("1")) {
                 printSystemAdmin();
-                while (scanner.hasNextInt()) {
-                    int innerInput = scanner.nextInt();
-                    if (innerInput == 1) {
+                while (scanner.hasNext()) {
+                    String innerInput = scanner.next();
+                    if (innerInput.equals("1")) {
                         createTables(stmt);
-                    } else if (innerInput == 2) {
+                    } else if (innerInput.equals("2")) {
                         deleteTables(stmt);
-                    } else if (innerInput == 3) {
+                    } else if (innerInput.equals("3")) {
                         loadData(stmt, con);
-                    } else if (innerInput == 4) {
+                    } else if (innerInput.equals("4")) {
                         checkData(stmt);
-                    } else if (innerInput == 5) {
+                    } else if (innerInput.equals("5")) {
                         break;
                     } else {
                         System.out.println("[Error] Invalid input.");
                     }
                     printSystemAdmin();
                 }
-            }else if (input == 2) {
+            }else if (input.equals("2")) {
                 printPassenger();
-                while (scanner.hasNextInt()) {
-                    int innerInput = scanner.nextInt();
-                    if (innerInput == 1) {
+                while (scanner.hasNext()) {
+                    String innerInput = scanner.next();
+                    if (innerInput.equals("1")) {
                         requestRide(con);
-                    } else if (innerInput == 2) {
+                    } else if (innerInput.equals("2")) {
                         checkRecord(con);
-                    } else if (innerInput == 3) {
+                    } else if (innerInput.equals("3")){
                         rate(con);
-                    } else if (innerInput == 4) {
+                    } else if (innerInput.equals("4")) {
                         break;
                     } else {
                         System.out.println("[Error] Invalid input.");
                     }
                     printPassenger();
                 }
-            }else if (input == 3) {
+            }else if (input.equals("3")) {
                 printDriver();
-                while (scanner.hasNextInt()) {
-                    int innerInput = scanner.nextInt();
-                    if (innerInput == 1) {
+                while (scanner.hasNext()) {
+                    String innerInput = scanner.next();
+                    if (innerInput.equals("1")) {
                         TakeRequest(con);
-                    } else if (innerInput == 2) {
+                    } else if (innerInput.equals("2")) {
                         FinishTrip(stmt, con);
-                    } else if (innerInput == 3) {
+                    } else if (innerInput.equals("3")) {
                         checkDriverRating(stmt, con);
-                    } else if (innerInput == 4) {
+                    } else if (innerInput.equals("4")) {
                         break;
                     } else {
                         System.out.println("[Error] Invalid input.");
@@ -1016,7 +1019,7 @@ public class RideSharingSystem {
                     printDriver();
                 }
 
-            }else if (input == 4) {
+            }else if (input.equals("4")) {
                 System.out.println("Bye.");
                 System.exit(0);
             } else {
