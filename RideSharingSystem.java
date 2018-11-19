@@ -574,7 +574,7 @@ public class RideSharingSystem {
     public static void TakeRequest(Connection con) throws SQLException 
     {
 	    int did,myYear,mySeat,takeRequestID;
-	    set<Integer> set=new  HashSet<Integer>(); 
+	    Set<Integer> set=new  HashSet<Integer>(); 
 	    String myModel;
 	    Scanner scanner = new Scanner(System.in);
 
@@ -585,7 +585,7 @@ public class RideSharingSystem {
 		    System.out.println("Error: no such driver");
 		    return;
 	    }
-	    if(!checkUnfinishTrip(con,did))
+	    if(checkUnfinishTrip(con,did))
 	    {
 		    System.out.println("Error: You have unfinished trip");
 		    return;
@@ -632,7 +632,7 @@ public class RideSharingSystem {
 	    System.out.println("Please enter the request ID");
 	    takeRequestID=scanner.nextInt();
 
-	    if(!set.contain(takeRequestID))
+	    if(!set.contains(takeRequestID))
 	    {
 		    System.out.println("Please take a request ID from the above list");
 		    return;
