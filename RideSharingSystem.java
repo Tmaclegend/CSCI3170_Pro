@@ -675,17 +675,22 @@ public class RideSharingSystem {
 
     }
 
-    public static void FinishTrip(Statement stmt) throws SQLException {
+    public static void FinishTrip(Statement stmt, Connection con) throws SQLException {
         //get the id
         System.out.println("Please enter your ID.");
 
         //get the did
         Scanner scanner = new Scanner(System.in);
-        while (!scanner.hasNextInt()) {
-            System.out.println("Wrong or Invalid input\n Please enter your ID");
+        //while (!scanner.hasNextInt()) {
+        if (!scanner.hasNextInt()) {
+            System.out.println("[Error] Invalid input");
+            return;
         }
         int did = scanner.nextInt(); 
-
+        if(!checkDid(con,did)){
+            System.out.println("Error: no such driver");
+            return;
+        }
         //get the current trip info
         String query = "SELECT t.id, t.passenger_id, t.start "
                + "FROM trip t "
@@ -702,13 +707,13 @@ public class RideSharingSystem {
             System.out.println(rs.getInt("id") + ", " + rs.getInt("passenger_id") + ", " +rs.getDate("start"));
             System.out.println("Do you wish to finish the trip? [y/n]");
             while(!scanner.hasNext()){ // stupid method
-                System.out.println("Wrong or Invalid input\n Please enter [y/n]."); 
+                System.out.println("Wrong or Invalid input\nPlease enter [y/n]."); 
             }
             String input = scanner.next();
             while(input.charAt(0) != 'y' && input.charAt(0) != 'n'){
-                System.out.println("Wrong or Invalid input\n Please enter [y/n]."); 
+                System.out.println("Wrong or Invalid input\nPlease enter [y/n]."); 
                 while(!scanner.hasNext()){
-                    System.out.println("Wrong or Invalid input\n Please enter [y/n]."); 
+                    System.out.println("Wrong or Invalid input\nPlease enter [y/n]."); 
                 }
                 input = scanner.next();
             }
@@ -754,26 +759,59 @@ public class RideSharingSystem {
     }
 
 
-    public static void checkDriverRating(Statement stmt) throws SQLException {
-	float rating;
+    public static void checkDriverRating(Statement stmt, Connection con) throws SQLException {
+	    float rating;
         System.out.println("Please enter your ID.");
         Scanner scanner = new Scanner(System.in);
-        while (!scanner.hasNextInt()) {
-            System.out.println("Wrong or Invalid input\n Please enter your ID");
+        //while (!scanner.hasNextInt()) {
+        if (!scanner.hasNextInt()) {
+            System.out.println("[Error] Invalid input!");
+            return;
         }
         int did = scanner.nextInt();
+        if(!checkDid(con,did)){
+            System.out.println("Error: no such driver");
+            return;
+        }
         //query
-        String query = "Select round(avg(rating),2) as avgrating FROM trip t WHERE  t.driver_id = " + did + " AND  t.rating!=0";
+        //String query = "Select round(avg(rating),2) as avgrating FROM trip t WHERE  t.driver_id = " + did + " AND  t.rating!=0";
+        String getRatedTripCount = "select count(*) as count from trip where "
+                                        +"driver_id = "+ did +" and "
+                                        +"rating is not null;";
 
+        String getRating = "select round(avg(rating),2) as rating from ("
+                                    +"select * from trip where "
+                                        +"driver_id = "+ did +" and "
+                                        +"rating is not null "
+                                        +"order by id desc "
+                                        +"limit 5) temp;";
+        ResultSet rs = null;
         try {
-		ResultSet rs = stmt.executeQuery(query);
-		rs.next();
-		rating=rs.getFloat("avgrating");
-		System.out.println("Your driver rating is"+rating);
+            rs = stmt.executeQuery(getRatedTripCount);
+            rs.next();
+            int ratedTripCount = rs.getInt("count");
+            if(ratedTripCount >= 5 ){
+                rs = stmt.executeQuery(getRating);
+                rs.next();
+                rating = rs.getFloat("rating");
+                System.out.println("Your driver rating is "+rating+".");
+            }else{
+                System.out.println("You don't have enought rated trips.");
+            }
+            
         } catch (SQLException ex) {
             System.out.println("Error in Show Driver Rating");
-	    System.out.println(ex.getMessage());
+            System.out.println(ex.getMessage());
         }
+     //    try {
+    	// 	rs = stmt.executeQuery(query);
+    	// 	rs.next();
+    	// 	rating=rs.getFloat("avgrating");
+    	// 	System.out.println("Your driver rating is "+rating);
+     //    } catch (SQLException ex) {
+     //        System.out.println("Error in Show Driver Rating");
+	    // System.out.println(ex.getMessage());
+     //    }
     }
 
     public static void printRideSharingSystem() {
@@ -853,9 +891,9 @@ public class RideSharingSystem {
                     if (innerInput == 1) {
                         TakeRequest(con);
                     } else if (innerInput == 2) {
-                        FinishTrip(stmt);
+                        FinishTrip(stmt, con);
                     } else if (innerInput == 3) {
-                        checkDriverRating(stmt);
+                        checkDriverRating(stmt, con);
                     } else if (innerInput == 4) {
                         break;
                     } else {
