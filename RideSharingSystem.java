@@ -265,6 +265,7 @@ public class RideSharingSystem {
         }
         catch (SQLException e)
         {
+            System.out.println("Error: sql select fail");
             System.out.println(e.getMessage());
         }
 
@@ -285,6 +286,7 @@ public class RideSharingSystem {
         }
         catch (SQLException e)
         {
+            System.out.println("Error: sql select fail");
             System.out.println(e.getMessage());
         }
 
@@ -305,6 +307,7 @@ public class RideSharingSystem {
         }
         catch (SQLException e)
         {
+            System.out.println("Error: sql select fail");
             System.out.println(e.getMessage());
         }
 
@@ -319,15 +322,28 @@ public class RideSharingSystem {
         PreparedStatement pstmt;
 
         System.out.println("Please enter your ID");
-        pid = scanner.nextInt();
+        try{
+            pid = scanner.nextInt();
+        }catch(Exception e){
+            System.out.println("ERROR: Invalid Input");
+            return;
+        }
+
         System.out.println("Please enter number of passenger");
-        seat= scanner.nextInt();
+        try{
+            seat= scanner.nextInt();
+        }catch(Exception e){
+            System.out.println("ERROR: Invalid Input");
+            return;
+        }
+
         scanner.nextLine();
         System.out.println("Please enter earlist model year. (Press enter to skip)");
         year = scanner.nextLine();
+
         System.out.println("Please enter the model. (Press enter to skip)");
         model = scanner.nextLine();
-        
+
         //check input
         if(!checkPid(con,pid))
         {
@@ -368,6 +384,7 @@ public class RideSharingSystem {
         }
         catch(SQLException e)
         {
+            System.out.println("Error: sql select fail");
             System.out.println(e.getMessage());
             return;
         }
@@ -386,6 +403,7 @@ public class RideSharingSystem {
         }
         catch(SQLException e)
         {
+            System.out.println("Error: sql insert fail");
             System.out.println(e.getMessage());
         }
 
@@ -400,7 +418,13 @@ public class RideSharingSystem {
         Scanner scanner =  new Scanner(System.in);
 
         System.out.println("Please enter your ID.");
-        pid = scanner.nextInt();
+        try{
+            pid = scanner.nextInt();
+        }catch(Exception e){
+            System.out.println("ERROR: Invalid Input");
+            return;
+        }
+
         System.out.println("Please enteer your start date.");
         queryStart = scanner.next();
         System.out.println("Please enteer your end date.");
@@ -456,6 +480,7 @@ public class RideSharingSystem {
         } 
         catch(SQLException e)
         {
+            System.out.println("Error: sql select fail");
             System.out.println(e.getMessage());
         }
     }
@@ -472,11 +497,28 @@ public class RideSharingSystem {
 
         //input
         System.out.println("Please enter your ID.");
-        pid = scanner.nextInt();
+        try{
+            pid = scanner.nextInt();
+        }catch(Exception e){
+            System.out.println("ERROR: Invalid Input");
+            return;
+        }
+
         System.out.println("Please enter your trip ID.");
-        tid = scanner.nextInt();
+        try{
+            tid = scanner.nextInt();
+        }catch(Exception e){
+            System.out.println("ERROR: Invalid Input");
+            return;
+        }
+
         System.out.println("Please enter your rating.");
-        rating = scanner.nextInt();
+        try{
+            rating = scanner.nextInt();
+        }catch(Exception e){
+            System.out.println("ERROR: Invalid Input");
+            return;
+        }
 
         //check input
         if(!checkPidTid(con, pid, tid))
@@ -501,6 +543,7 @@ public class RideSharingSystem {
             pstmt.executeUpdate();
         } catch (SQLException e)
         {
+            System.out.println("Error: sql update fail");
             System.out.println(e.getMessage());
         }
 
@@ -531,6 +574,7 @@ public class RideSharingSystem {
         } 
         catch(SQLException e)
         {
+            System.out.println("Error: sql select fail");
             System.out.println(e.getMessage());
         }
 
@@ -560,6 +604,7 @@ public class RideSharingSystem {
         }
         catch (SQLException e)
         {
+            System.out.println("Error: sql select fail");
             System.out.println(e.getMessage());
         }
 
@@ -579,6 +624,7 @@ public class RideSharingSystem {
         }
         catch (SQLException e)
         {
+            System.out.println("Error: sql select fail");
             System.out.println(e.getMessage());
         }
 
@@ -594,8 +640,14 @@ public class RideSharingSystem {
 	    Scanner scanner = new Scanner(System.in);
 
 	    System.out.println("Please enter your ID");
-	    did = scanner.nextInt();
-	    if(!checkDid(con,did))
+	    try{
+            did = scanner.nextInt();
+	    }catch(Exception e){
+            System.out.println("ERROR: Invalid Input");
+            return;
+        }
+
+        if(!checkDid(con,did))
 	    {
 		    System.out.println("Error: no such driver");
 		    return;
@@ -619,6 +671,7 @@ public class RideSharingSystem {
 	    }
 	    catch(SQLException e)
 	    {
+            System.out.println("Error: sql select fail");
 		    System.out.println(e.getMessage());
 		    return;
 	    }
@@ -635,7 +688,7 @@ public class RideSharingSystem {
 		    System.out.println("Request ID, Passenger Name, Passengers");
 		    while(rs.next())
 		    {
-				System.out.println(rs.getInt("r.id")+" "+rs.getString("p.name")+" "+rs.getInt("r.passengers"));
+				System.out.println(rs.getInt("r.id")+", "+rs.getString("p.name")+", "+rs.getInt("r.passengers"));
 				set.add(rs.getInt("r.id"));
 				map.put(rs.getInt("r.id"),rs.getInt("r.passenger_id"));
 				count++;
@@ -648,13 +701,21 @@ public class RideSharingSystem {
 		    }
 	    } catch (SQLException e)
 	    {
+            System.out.println("Error: sql select fail");
 		    System.out.println(e.getMessage());
+            return;
 	    }
 
 	    // io and checking
 	    System.out.println("Please enter the request ID");
-	    takeRequestID=scanner.nextInt();
-	    if(!set.contains(takeRequestID))
+	    try{
+            takeRequestID=scanner.nextInt();
+	    }catch(Exception e){
+            System.out.println("ERROR: Invalid Input");
+            return;
+        }
+
+        if(!set.contains(takeRequestID))
 	    {
 		    System.out.println("Please take a request ID from the above list");
 		    return;
@@ -668,24 +729,52 @@ public class RideSharingSystem {
 		    pstmt.executeUpdate();
 	    }catch(SQLException e)
 	    {
+            System.out.println("Error: sql update fail");
 		    System.out.println(e.getMessage());
 		    return;
 	    }
 
 	    //insert into trip
+        java.sql.Timestamp start = null;
 	    try
 	    {
 		    PreparedStatement pstmt = con.prepareStatement("INSERT INTO trip (driver_id,passenger_id,start,end,fee,rating) value(?,?,?,NULL,NULL,0)");
 		    pstmt.setInt(1,did);
 		    pstmt.setInt(2,map.get(takeRequestID));
-		    java.sql.Timestamp start = new java.sql.Timestamp(System.currentTimeMillis());
+		    start = new java.sql.Timestamp(System.currentTimeMillis());
 		    pstmt.setTimestamp(3,start);
 		    pstmt.executeUpdate();
 	    }catch(SQLException e)
 	    {
+            System.out.println("Error: sql insert fail");
 		    System.out.println(e.getMessage());
 		    return;
 	    }
+
+        try
+        {
+            PreparedStatement pstmt = con.prepareStatement("SELECT t.id , p.name, t.start "
+                                                            +"FROM trip t, passenger p "
+                                                            +"WHERE t.passenger_id=p.id "
+                                                            +"AND t.driver_id = ? "
+                                                            +"AND t.passenger_id = ? "
+                                                            +"AND t.start = ?;");
+            pstmt.setInt(1,did);
+            pstmt.setInt(2,map.get(takeRequestID));
+            pstmt.setTimestamp(3,start);
+            ResultSet rs = pstmt.executeQuery();
+
+            System.out.println("Trip ID, Passenger Name, Passengers");
+            if(rs.next())
+            {
+                System.out.println(rs.getInt("t.id")+", "+rs.getString("p.name")+", "+rs.getTimestamp("t.start"));
+            }
+        } catch (SQLException e)
+        {
+            System.out.println("Error: sql select fail");
+            System.out.println(e.getMessage());
+        }
+            
 
     }
 
@@ -696,11 +785,14 @@ public class RideSharingSystem {
         //get the did
         Scanner scanner = new Scanner(System.in);
         //while (!scanner.hasNextInt()) {
-        if (!scanner.hasNextInt()) {
-            System.out.println("[Error] Invalid input");
+        int did = 0;
+        try{
+            did = scanner.nextInt(); 
+        }catch(Exception e){
+            System.out.println("ERROR: Invalid Input");
             return;
         }
-        int did = scanner.nextInt(); 
+
         if(!checkDid(con,did)){
             System.out.println("Error: no such driver");
             return;
@@ -718,18 +810,19 @@ public class RideSharingSystem {
         }
         if (rs.next() ){
             System.out.println("Trip ID, Passnger ID, Start");
-            System.out.println(rs.getInt("id") + ", " + rs.getInt("passenger_id") + ", " +rs.getDate("start"));
+            System.out.println(rs.getInt("id") + ", " + rs.getInt("passenger_id") + ", " +rs.getTimestamp("start"));
             System.out.println("Do you wish to finish the trip? [y/n]");
-            while(!scanner.hasNext()){ // stupid method
-                System.out.println("Wrong or Invalid input\nPlease enter [y/n]."); 
-            }
+            // while(!scanner.hasNext()){ // stupid method
+            //     System.out.println("Wrong or Invalid input\nPlease enter [y/n]."); 
+            // }
             String input = scanner.next();
-            while(input.charAt(0) != 'y' && input.charAt(0) != 'n'){
-                System.out.println("Wrong or Invalid input\nPlease enter [y/n]."); 
-                while(!scanner.hasNext()){
-                    System.out.println("Wrong or Invalid input\nPlease enter [y/n]."); 
-                }
-                input = scanner.next();
+            if(input.charAt(0) != 'y' && input.charAt(0) != 'n'){
+                System.out.println("ERROR: Invalid input"); 
+                return;
+                // while(!scanner.hasNext()){
+                //     System.out.println("Wrong or Invalid input\nPlease enter [y/n]."); 
+                // }
+                // input = scanner.next();
             }
             if(input.charAt(0) == 'n'){
                 return;
@@ -778,11 +871,18 @@ public class RideSharingSystem {
         System.out.println("Please enter your ID.");
         Scanner scanner = new Scanner(System.in);
         //while (!scanner.hasNextInt()) {
-        if (!scanner.hasNextInt()) {
-            System.out.println("[Error] Invalid input!");
+        // if (!scanner.hasNextInt()) {
+        //     System.out.println("[Error] Invalid input!");
+        //     return;
+        // }
+        int did = 0;
+        try{
+            did = scanner.nextInt();
+        }catch(Exception e){
+            System.out.println("ERROR: Invalid Input");
             return;
         }
-        int did = scanner.nextInt();
+
         if(!checkDid(con,did)){
             System.out.println("Error: no such driver");
             return;
@@ -810,7 +910,7 @@ public class RideSharingSystem {
                 rating = rs.getFloat("rating");
                 System.out.println("Your driver rating is "+rating+".");
             }else{
-                System.out.println("You don't have enought rated trips.");
+                System.out.println("You don't have enough rated trips.");
             }
             
         } catch (SQLException ex) {
@@ -915,6 +1015,7 @@ public class RideSharingSystem {
                     }
                     printDriver();
                 }
+
             }else if (input == 4) {
                 System.out.println("Bye.");
                 System.exit(0);
