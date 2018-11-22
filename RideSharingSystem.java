@@ -798,19 +798,20 @@ public class RideSharingSystem {
             return;
         }
         //get the current trip info
-        String query = "SELECT t.id, t.passenger_id, t.start "
-               + "FROM trip t "
-               + "WHERE t.driver_id = " + did + " AND end IS NULL;";
+        String query = "SELECT t.id, p.name, t.start "
+               + "FROM trip t,passenger p"
+               + " WHERE t.passenger_id=p.id AND t.driver_id = " + did + " AND t.end IS NULL;";
         ResultSet rs = null;
         try {
             rs = stmt.executeQuery(query);
         } catch (SQLException ex) {
             System.out.println("Error in finding trip");
+	    //System.out.println(ex.getMessage());
             return;
         }
         if (rs.next() ){
             System.out.println("Trip ID, Passnger ID, Start");
-            System.out.println(rs.getInt("id") + ", " + rs.getInt("passenger_id") + ", " +rs.getTimestamp("start"));
+            System.out.println(rs.getInt("t.id") + ", " + rs.getString("p.name") + ", " +rs.getTimestamp("t.start"));
             System.out.println("Do you wish to finish the trip? [y/n]");
             // while(!scanner.hasNext()){ // stupid method
             //     System.out.println("Wrong or Invalid input\nPlease enter [y/n]."); 
@@ -832,9 +833,9 @@ public class RideSharingSystem {
                 //long diff = rs.getDate("start").getTime();
 
                 //calculate the fee and record all thwe things to print
-                int tid = rs.getInt("id");
-                String name = rs.getString("passenger_id");
-                java.sql.Timestamp  start = rs.getTimestamp("start");
+                int tid = rs.getInt("t.id");
+                String name = rs.getString("p.name");
+                java.sql.Timestamp  start = rs.getTimestamp("t.start");
                 //int fee = (int)(diff / 60);
                 java.sql.Timestamp end = new java.sql.Timestamp(System.currentTimeMillis());
 
