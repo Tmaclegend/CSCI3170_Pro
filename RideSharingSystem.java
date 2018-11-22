@@ -895,15 +895,11 @@ public class RideSharingSystem {
         //String query = "Select round(avg(rating),2) as avgrating FROM trip t WHERE  t.driver_id = " + did + " AND  t.rating!=0";
         String getRatedTripCount = "select count(*) as count from trip where "
                                         +"driver_id = "+ did +" and "
-                                        +"rating is not null;";
+                                        +"rating >0;";
 
-        String getRating = "select round(avg(rating),2) as rating from ("
-                                    +"select * from trip where "
-                                        +"driver_id = "+ did +" and "
-                                        +"rating > 0 "
-                                        +"order by id desc "
-                                        +"limit 5) temp;";
-        ResultSet rs = null;
+        String getRating = "SELECT round(avg(rating),2) as rating FROM trip WHERE rating>0 AND driver_id="+did;
+        
+	ResultSet rs = null;
         try {
             rs = stmt.executeQuery(getRatedTripCount);
             rs.next();
