@@ -5,8 +5,7 @@
 # Group Members:
 # Suen Ka Leong 1155062592
 # Mok Yat Man 1155078128
-#
-#
+# So Hon Chuen 1155062753
 # ------------------------
 # Compile and Run Script
 
