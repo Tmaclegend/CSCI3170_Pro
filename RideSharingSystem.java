@@ -899,7 +899,7 @@ public class RideSharingSystem {
         String getRating = "select round(avg(rating),2) as rating from ("
                                     +"select * from trip where "
                                         +"driver_id = "+ did +" and "
-                                        +"rating > 0 "
+                                        +"rating is not null "
                                         +"order by id desc "
                                         +"limit 5) temp;";
         ResultSet rs = null;
